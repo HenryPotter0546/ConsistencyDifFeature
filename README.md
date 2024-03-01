@@ -22,16 +22,6 @@ lcm_model_name: choose the diffusion model
 ######
 extract_mode:"iid_noise_denoise" means add one step noise
 
-####
-test.yaml 
-#####
-for test_aggregation_network.py
-
-####
-pca.yaml 
-#####
-for pca_visualization.py
-
 
 ### train_aggregation_network.py
 set config path as train.yaml, then run train_aggregation_network.py
