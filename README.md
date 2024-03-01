@@ -10,7 +10,7 @@ pip install -r requirements.txt
 
 ### configs
 ####
-train.yaml 
+e.g. train.yaml 
 #####
 parameters:
 ```
@@ -22,10 +22,14 @@ extract_mode:"iid_noise_denoise" means add one step noise
 ### train_aggregation_network.py
 set config path as train.yaml, then run train_aggregation_network.py
 
+### test_aggregation_network.py
+set config path as test.yaml, then run test_aggregation_network.py
+
+### get the pca outcome
+set config path as pca.yaml run pca_visualization.py in utils
+
 ### try the correspondence task in any pair of image
 using notebook run demo.ipynb
 
-### get the pca outcome
-run pca_visualization.py in utils
 
 
