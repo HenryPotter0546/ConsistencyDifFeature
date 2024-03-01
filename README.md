@@ -10,11 +10,25 @@ pip install -r requirements.txt
 
 ### configs
 ####
-train.yaml for train_aggregation_network.py
+train.yaml 
+#####
+for train_aggregation_network.py
+#####
+save_timestep: choose which timestep to aggregate
+#####
+lcm_model_name: choose the diffusion model
+#####
+extract_mode:"iid_noise_denoise" means add one step noise
+
 ####
-test.yaml for test_aggregation_network.py
+test.yaml 
+#####
+for test_aggregation_network.py
+
 ####
-pca.yaml for pca_visualization.py
+pca.yaml 
+#####
+for pca_visualization.py
 
 
 ### train_aggregation_network.py
