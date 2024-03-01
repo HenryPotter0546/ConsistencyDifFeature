@@ -1,0 +1,12 @@
+ipykernel
+ipympl
+xformers
+matplotlib
+torch==2.1.0+cu118
+diffusers
+transformers
+accelerate
+fvcore
+omegaconf
+pandas
+scikit-learn==1.0.2
