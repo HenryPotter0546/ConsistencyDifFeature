@@ -12,16 +12,12 @@ pip install -r requirements.txt
 ####
 train.yaml 
 #####
-for train_aggregation_network.py
-#####
 parameters:
-######
+```
 save_timestep: choose which timestep to aggregate
-######
 lcm_model_name: choose the diffusion model
-######
 extract_mode:"iid_noise_denoise" means add one step noise
-
+```
 
 ### train_aggregation_network.py
 set config path as train.yaml, then run train_aggregation_network.py
