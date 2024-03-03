@@ -19,6 +19,7 @@ from utils.util import (
     compute_pck,
     rescale_points
 )
+from utils.wandb_util import get_wandb_run_name
 from src.detectron2.resnet import collect_dims
 from src.aggregation_network import AggregationNetwork
 from src.feature_extractor import CDHFExtractor
@@ -49,7 +50,14 @@ def log_aggregation_network(aggregation_network, config):
     ax.set_yticks(range(num_layers))
     ax.set_yticklabels(range(1, num_layers+1))
     ax.set_xlabel("Timestep")
-    ax.set_xticklabels(save_timestep)
+    timestep_label = []
+    for ts in save_timestep:
+        if ts == 49:
+            timestep_label.append(0)
+        else:
+            timestep_label.append(50-ts)
+    timestep_label.reverse()
+    ax.set_xticklabels(timestep_label)
     ax.set_xticks(range(num_timesteps))
     wandb.log({f"mixing_weights": plt})
 
@@ -207,7 +215,7 @@ def load_models(config_path):
 
 def main(args):
     config, diffusion_extractor, aggregation_network = load_models(args.config_path)
-    wandb.init(project=config["wandb_project"], name=config["wandb_run"])
+    wandb.init(project=config["wandb_project"], name=get_wandb_run_name(config))
     wandb.run.name = f"{str(wandb.run.id)}_{wandb.run.name}"
     parameter_groups = [
         {"params": aggregation_network.mixing_weights, "lr": config["lr"]},

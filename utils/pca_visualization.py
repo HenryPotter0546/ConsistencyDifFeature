@@ -191,8 +191,3 @@ if __name__ == "__main__":
         save_dir.mkdir(exist_ok=True, parents=True)
         pca_per_image = pca(config, images_paths, args.load_size, args.layer, args.facet, args.bin, args.stride, args.model_type,
                             args.n_components, args.all_together,)
-
-        print("saving images")
-        for image_path, (pil_image, pca_image) in tqdm(zip(images_paths, pca_per_image)):
-            save_prefix = image_path.stem
-            plot_pca(pil_image, pca_image, str(save_dir), args.last_components_rgb, args.save_resized, save_prefix)

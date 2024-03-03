@@ -18,6 +18,7 @@ from utils.util import (
     compute_pck,
     rescale_points
 )
+from utils.wandb_util import get_wandb_run_name
 from src.detectron2.resnet import collect_dims
 from src.aggregation_network import AggregationNetwork
 from src.feature_extractor import CDHFExtractor
@@ -84,7 +85,7 @@ def test(config, diffusion_extractor, aggregation_network, files_list):
 
 def main(args):
     config, diffusion_extractor, aggregation_network = load_models(args.config_path)
-    wandb.init(project=config["wandb_project"],name=config["wandb_run"])
+    wandb.init(project=config["wandb_project"],name=f"checkpoint_Test_{get_wandb_run_name(config)}")
     wandb.run.name = f"{str(wandb.run.id)}_{wandb.run.name}"
     
     parameter_groups = [
