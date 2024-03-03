@@ -1,6 +1,5 @@
 # ======== Customize Paths =======
 image_path: /home/zzw5373/datasets/SPair-71k/JPEGImages
-wandb_run: checkpoint_Test_LCM_Dreamshaper_v7_iid_noise_denoise   # timesteps_49_45_40_LCM_Dreamshaper_v7_iid_noise_denoise
 wandb_project: cdhf
 wandb_team_name: berkely_akio
 results_folder: test_result

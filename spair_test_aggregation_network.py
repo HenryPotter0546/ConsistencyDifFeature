@@ -33,7 +33,14 @@ def test(config, diffusion_extractor, aggregation_network, files_list):
     device = config.get("device", "cuda")
     output_size, load_size = get_rescale_size(config)
     pck_threshold = config["pck_threshold"]
-    test_dist, test_pck_img, test_pck_bbox = [], [], []
+    test_dist_all, test_pck_img_all, test_pck_bbox_all = [], [], []
+
+    test_dist_category_dict = {}
+    test_pck_img_category_dict = {}
+    test_pck_bbox_category_dict = {}
+
+    current_category = None
+    category_count = 0
     
     #test_anns = json.load(open(config["test_path"]))
     for j, an in tqdm(enumerate(files_list)):
@@ -61,24 +68,49 @@ def test(config, diffusion_extractor, aggregation_network, files_list):
             wandb.log({"test/sample_pck_bbox": sample_pck_bbox}, step=j)
             print(ann["category"])
             
-            test_dist.append(dist)
-            test_pck_img.append(pck_img)
-            test_pck_bbox.append(pck_bbox)
+            test_dist_all.append(dist)
+            test_pck_img_all.append(pck_img)
+            test_pck_bbox_all.append(pck_bbox)
+
+            test_dist_category_dict[ann["category"]] = test_dist_category_dict.get(ann["category"], []) + [dist]
+            test_pck_img_category_dict[ann["category"]] = test_pck_img_category_dict.get(ann["category"], []) + [pck_img]
+            test_pck_bbox_category_dict[ann["category"]] = test_pck_bbox_category_dict.get(ann["category"], []) + [pck_bbox]
+
     
         if j % 100 ==0 and j > 0:
-            test_pck_img_wandb = np.concatenate(test_pck_img)
-            test_pck_bbox_wandb = np.concatenate(test_pck_bbox)
+            test_pck_img_wandb = np.concatenate(test_pck_img_all)
+            test_pck_bbox_wandb = np.concatenate(test_pck_bbox_all)
     
             wandb.log({"test/pck_img": test_pck_img_wandb.sum() / len(test_pck_img_wandb)})
             wandb.log({"test/pck_bbox": test_pck_bbox_wandb.sum() / len(test_pck_bbox_wandb)})
+        
+        if current_category is None:
+            current_category = ann["category"]
+        elif current_category != ann["category"]:
+            test_pck_img_wandb_category = np.concatenate(test_pck_img_category_dict[current_category])
+            test_pck_bbox_wandb_category = np.concatenate(test_pck_bbox_category_dict[current_category])
     
-    test_dist = np.concatenate(test_dist)
-    test_pck_img = np.concatenate(test_pck_img)
-    test_pck_bbox = np.concatenate(test_pck_bbox)
+            wandb.log({f"test/{current_category}/pck_img": test_pck_img_wandb_category.sum() / len(test_pck_img_wandb_category)})
+            wandb.log({f"test/{current_category}/pck_bbox": test_pck_bbox_wandb_category.sum() / len(test_pck_bbox_wandb_category)})
+            current_category = ann["category"]
+            category_count = 0
+
+        if category_count % 100 ==0 and category_count > 0:
+            test_pck_img_wandb_category = np.concatenate(test_pck_img_category_dict[current_category])
+            test_pck_bbox_wandb_category = np.concatenate(test_pck_bbox_category_dict[current_category])
+    
+            wandb.log({f"test/{current_category}/pck_img": test_pck_img_wandb_category.sum() / len(test_pck_img_wandb_category)})
+            wandb.log({f"test/{current_category}/pck_bbox": test_pck_bbox_wandb_category.sum() / len(test_pck_bbox_wandb_category)})
+
+        category_count += 1
+    
+    test_dist_all = np.concatenate(test_dist_all)
+    test_pck_img_all = np.concatenate(test_pck_img_all)
+    test_pck_bbox_all = np.concatenate(test_pck_bbox_all)
     df = pd.DataFrame({
-        "distances": test_dist,
-        "pck_img": test_pck_img,
-        "pck_bbox": test_pck_bbox,
+        "distances": test_dist_all,
+        "pck_img": test_pck_img_all,
+        "pck_bbox": test_pck_bbox_all,
     })
     
     wandb.log({f"test/distances_csv": wandb.Table(dataframe=df)})
