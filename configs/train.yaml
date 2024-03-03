@@ -1,21 +1,19 @@
 # ======== Customize Paths =======
-image_path: /home/zzw5373/wh/datasets/SPair-71k/JPEGImages
-wandb_run: timesteps_49_45_40_35_30_25_20_stable_diffusion_iid_noise_denoise  # timesteps_49_45_40_LCM_Dreamshaper_v7_iid_noise_denoise
+image_path: C:\Users\kyouk\Documents\Berkeley\Projects\ConsistentDiffusionHyperfeatures\datasets\SPair-71k\JPEGImages
+wandb_run: timesteps_45_35_30_stable_diffusion_iid_noise_denoise  # timesteps_49_45_40_LCM_Dreamshaper_v7_iid_noise_denoise
 wandb_project: cdhf
 results_folder: model_ckpt
 # ======== Data / Logging ========
 pck_threshold: 0.1
-train_path: annotations/spair_71k_train.json
-val_path: annotations/spair_71k_val-360.json
-test_path: annotations/spair_71k_test-6.json
-# weights_path: /home/zzw5373/wh/ConsistentDiffusionHyperfeatures/top_ckpt/checkpoint_step_2500.pt
+train_path: annotations\spair_71k_train.json
+val_path: annotations\spair_71k_val-360.json
 flip_timesteps: False
 # ======= Ours (All Steps) =======
 # save_timestep: [49, 45, 40, 35, 30, 25, 20, 15, 10, 5, 0]
 # num_timesteps: 50
 # ======== Ours - One-Step =======
 dual: False
-save_timestep: [49, 45, 40, 35, 30, 25, 20] #[35, 30, 25, 20, 15, 10, 5] #[49, 45, 40, 35, 30, 25, 20] #[26, 24, 22, 20, 18, 16, 14] [49, 45, 40, 35, 30], [49, 45, 40, 35, 30, 25, 20, 15, 10, 5, 0], [49, 45, 40, 35, 30, 25, 20],  [49, 48, 46, 42, 34, 18]  not tried, [49, 45, 40], [49, 40, 30], [49, 35]
+save_timestep: [45, 35, 30] #[35, 30, 25, 20, 15, 10, 5] #[49, 45, 40, 35, 30, 25, 20] #[26, 24, 22, 20, 18, 16, 14] [49, 45, 40, 35, 30], [49, 45, 40, 35, 30, 25, 20, 15, 10, 5, 0], [49, 45, 40, 35, 30, 25, 20],  [49, 48, 46, 42, 34, 18]  not tried, [49, 45, 40], [49, 40, 30], [49, 35]
 num_timesteps: 50
 # ======= Training Hparams =======
 weight_decay: 0
@@ -38,5 +36,5 @@ prompt: ""
 negative_prompt: ""
 guidance_scale: -1
 # ======== LCM model name =========
-lcm_model_name: "LCM_Dreamshaper_v7"   # "LCM_Dreamshaper_v7", "lcm-lora-sdv1-5", "lcm-sdxl", "lcm-ssd-1b", "lcm-lora-sdxl", "lcm-lora-ssd-1b", "stable-diffusion-v1-5"
+lcm_model_name: "lcm-lora-sdv1-5"   # "LCM_Dreamshaper_v7", "lcm-lora-sdv1-5", "lcm-sdxl", "lcm-ssd-1b", "lcm-lora-sdxl", "lcm-lora-ssd-1b", "stable-diffusion-v1-5"
 extract_mode: "iid_noise_denoise"   # "iid_noise_denoise" ,   # "iid_noise_denoise", "consistency_generation", "ddim_inversion", "dual_unet_smoothing_generation", "dual_unet_smoothing_inversion", "w/o_noise_denoise"

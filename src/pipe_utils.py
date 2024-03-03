@@ -1,6 +1,5 @@
 from diffusers import UNet2DConditionModel, DiffusionPipeline, LCMScheduler, PNDMScheduler, DDIMScheduler
 from src.cdhf_pipelines import MyLCMPipeline
-from src.mysdxlpipeline import MySDXLipeline
 from src.my_sd_pipeline import MySDPipeline
 from src.my_unet import MyUNet2DConditionModel
 import torch
