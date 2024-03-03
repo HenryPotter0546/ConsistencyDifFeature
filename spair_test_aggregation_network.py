@@ -34,10 +34,15 @@ def test(config, diffusion_extractor, aggregation_network, files_list):
     output_size, load_size = get_rescale_size(config)
     pck_threshold = config["pck_threshold"]
     test_dist_all, test_pck_img_all, test_pck_bbox_all = [], [], []
+    test_pck_img_perimg, test_pck_bbox_perimg = [], []
 
-    test_dist_category_dict = {}
-    test_pck_img_category_dict = {}
-    test_pck_bbox_category_dict = {}
+    test_dist_category_dict = {"aeroplane":[],"bicycle":[],"bird":[],"boat":[],"bottle":[],"bus":[],"car":[],"cat":[],"chair":[],"cow":[],"dog":[],"horse":[],"motorbike":[],"person":[],"pottedplant":[],"sheep":[],"train":[],"tvmonitor":[]}
+    test_pck_img_category_dict = {"aeroplane":[],"bicycle":[],"bird":[],"boat":[],"bottle":[],"bus":[],"car":[],"cat":[],"chair":[],"cow":[],"dog":[],"horse":[],"motorbike":[],"person":[],"pottedplant":[],"sheep":[],"train":[],"tvmonitor":[]}
+    test_pck_bbox_category_dict = {"aeroplane":[],"bicycle":[],"bird":[],"boat":[],"bottle":[],"bus":[],"car":[],"cat":[],"chair":[],"cow":[],"dog":[],"horse":[],"motorbike":[],"person":[],"pottedplant":[],"sheep":[],"train":[],"tvmonitor":[]}
+    
+    test_pck_img_category_perimg_dict = {"aeroplane":[],"bicycle":[],"bird":[],"boat":[],"bottle":[],"bus":[],"car":[],"cat":[],"chair":[],"cow":[],"dog":[],"horse":[],"motorbike":[],"person":[],"pottedplant":[],"sheep":[],"train":[],"tvmonitor":[]}
+    test_pck_bbox_category_perimg_dict = {"aeroplane":[],"bicycle":[],"bird":[],"boat":[],"bottle":[],"bus":[],"car":[],"cat":[],"chair":[],"cow":[],"dog":[],"horse":[],"motorbike":[],"person":[],"pottedplant":[],"sheep":[],"train":[],"tvmonitor":[]}
+
 
     current_category = None
     category_count = 0
@@ -71,11 +76,14 @@ def test(config, diffusion_extractor, aggregation_network, files_list):
             test_dist_all.append(dist)
             test_pck_img_all.append(pck_img)
             test_pck_bbox_all.append(pck_bbox)
+            test_pck_img_perimg.append(sample_pck_img)
+            test_pck_bbox_perimg.append(sample_pck_bbox)
 
-            test_dist_category_dict[ann["category"]] = test_dist_category_dict.get(ann["category"], []) + [dist]
-            test_pck_img_category_dict[ann["category"]] = test_pck_img_category_dict.get(ann["category"], []) + [pck_img]
-            test_pck_bbox_category_dict[ann["category"]] = test_pck_bbox_category_dict.get(ann["category"], []) + [pck_bbox]
-
+            test_dist_category_dict[ann["category"]].append(dist)
+            test_pck_img_category_dict[ann["category"]].append(pck_img)
+            test_pck_bbox_category_dict[ann["category"]].append(pck_bbox)
+            test_pck_img_category_perimg_dict[ann["category"]].append(sample_pck_img)
+            test_pck_bbox_category_perimg_dict[ann["category"]].append(sample_pck_bbox)
     
         if j % 100 ==0 and j > 0:
             test_pck_img_wandb = np.concatenate(test_pck_img_all)
@@ -83,6 +91,10 @@ def test(config, diffusion_extractor, aggregation_network, files_list):
     
             wandb.log({"test/pck_img": test_pck_img_wandb.sum() / len(test_pck_img_wandb)})
             wandb.log({"test/pck_bbox": test_pck_bbox_wandb.sum() / len(test_pck_bbox_wandb)})
+
+            wandb.log({"test/pck_img_perimage": np.mean(test_pck_img_perimg)})
+            wandb.log({"test/pck_bbox_perimage": np.mean(test_pck_bbox_perimg)})
+
         
         if current_category is None:
             current_category = ann["category"]
@@ -92,15 +104,20 @@ def test(config, diffusion_extractor, aggregation_network, files_list):
     
             wandb.log({f"test/{current_category}/pck_img": test_pck_img_wandb_category.sum() / len(test_pck_img_wandb_category)})
             wandb.log({f"test/{current_category}/pck_bbox": test_pck_bbox_wandb_category.sum() / len(test_pck_bbox_wandb_category)})
+
+            wandb.log({f"test/{current_category}/pck_img_perimage": np.mean(test_pck_img_category_perimg_dict[current_category])})
+            wandb.log({f"test/{current_category}/pck_bbox_perimage": np.mean(test_pck_bbox_category_perimg_dict[current_category])})
             current_category = ann["category"]
             category_count = 0
-
-        if category_count % 100 ==0 and category_count > 0:
+        elif category_count % 100 ==0 and category_count > 0:
             test_pck_img_wandb_category = np.concatenate(test_pck_img_category_dict[current_category])
             test_pck_bbox_wandb_category = np.concatenate(test_pck_bbox_category_dict[current_category])
     
             wandb.log({f"test/{current_category}/pck_img": test_pck_img_wandb_category.sum() / len(test_pck_img_wandb_category)})
             wandb.log({f"test/{current_category}/pck_bbox": test_pck_bbox_wandb_category.sum() / len(test_pck_bbox_wandb_category)})
+
+            wandb.log({f"test/{current_category}/pck_img_perimage": np.mean(test_pck_img_category_perimg_dict[current_category])})
+            wandb.log({f"test/{current_category}/pck_bbox_perimage": np.mean(test_pck_bbox_category_perimg_dict[current_category])})
 
         category_count += 1
     
