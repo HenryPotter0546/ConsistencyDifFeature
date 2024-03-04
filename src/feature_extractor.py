@@ -131,7 +131,6 @@ class CDHFExtractor:
         self.pipe.scheduler.set_timesteps(self.num_time_steps, self.device)
         timesteps = self.pipe.scheduler.timesteps
 
-
         # 3. Unet reconstruction
         self.pipe.output_resolution = self.output_resolution
         init_resnet_func(self.pipe.unet, save_hidden=True, reset=True, idxs=self.idxs, save_timestep=self.save_timestep)

@@ -1,7 +1,8 @@
-from diffusers import UNet2DConditionModel, DiffusionPipeline, LCMScheduler, PNDMScheduler, DDIMScheduler, StableDiffusionPipeline
+from diffusers import UNet2DConditionModel, DiffusionPipeline, LCMScheduler, PNDMScheduler, DDIMScheduler, StableDiffusionPipeline, DDPMScheduler
 from src.cdhf_pipelines import MyLCMPipeline
 from src.my_sd_pipeline import MySDPipeline
 from src.my_unet import MyUNet2DConditionModel
+from src.myddpm_scheduler import MyDDPMScheduler
 import torch
 
 def pipe_selector(lcm_model_name):
@@ -46,7 +47,7 @@ def pipe_selector(lcm_model_name):
         # 3. normal stable diffusion model
         model_id = "runwayml/stable-diffusion-v1-5"
         unet = MyUNet2DConditionModel.from_pretrained(model_id, subfolder="unet")
-        pipe = DiffusionPipeline.from_pretrained("runwayml/stable-diffusion-v1-5", unet=unet)
+        pipe = MyLCMPipeline.from_pretrained("runwayml/stable-diffusion-v1-5", unet=unet)
         # pipe = MySDPipeline.from_pretrained("SimianLuo/LCM_Dreamshaper_v7", unet=unet)
         use_lora = False
         is_sdxl = False
@@ -82,8 +83,8 @@ def pipe_selector(lcm_model_name):
     if use_lcm:
         pipe.scheduler = LCMScheduler.from_config(pipe.scheduler.config)
     else:
-        # pipe.scheduler = PNDMScheduler.from_pretrained("runwayml/stable-diffusion-v1-5", subfolder="scheduler")
-        pass
+        pipe.scheduler = MyDDPMScheduler.from_pretrained("runwayml/stable-diffusion-v1-5", subfolder="scheduler")
+        # pass
         # pipe.scheduler = DDIMScheduler.from_config(
         # pipe.scheduler.config, rescale_betas_zero_snr=True, timestep_spacing="trailing"
         # )
