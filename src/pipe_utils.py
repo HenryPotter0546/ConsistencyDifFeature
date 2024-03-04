@@ -1,4 +1,4 @@
-from diffusers import UNet2DConditionModel, DiffusionPipeline, LCMScheduler, PNDMScheduler, DDIMScheduler
+from diffusers import UNet2DConditionModel, DiffusionPipeline, LCMScheduler, PNDMScheduler, DDIMScheduler, StableDiffusionPipeline
 from src.cdhf_pipelines import MyLCMPipeline
 from src.my_sd_pipeline import MySDPipeline
 from src.my_unet import MyUNet2DConditionModel
@@ -23,12 +23,23 @@ def pipe_selector(lcm_model_name):
         use_lora = False
         is_sdxl = False
     elif lcm_model_name == "lcm-lora-sdv1-5":
-        # 2. Dreamshaper_v7_base SD lora model
-        model_id = "Lykon/dreamshaper-7"
+        # # 2. Dreamshaper_v7_base SD lora model
+        # model_id = "Lykon/dreamshaper-7"
+        model_id = "runwayml/stable-diffusion-v1-5"
         lcm_lora_id = "latent-consistency/lcm-lora-sdv1-5"
-        unet = MyUNet2DConditionModel.from_pretrained("Lykon/dreamshaper-7", subfolder="unet")
+        # unet = MyUNet2DConditionModel.from_pretrained("Lykon/dreamshaper-7", subfolder="unet")
+        # pipe = MyLCMPipeline.from_pretrained(model_id, unet=unet, torch_dtype=torch.float16, variant="fp16")
+        # pipe.load_lora_weights(lcm_lora_id)
+        unet = MyUNet2DConditionModel.from_pretrained(model_id, subfolder="unet")
         pipe = MyLCMPipeline.from_pretrained(model_id, unet=unet, torch_dtype=torch.float16, variant="fp16")
+        # pipe.unet = unet
         pipe.load_lora_weights(lcm_lora_id)
+        pipe.fuse_lora(
+                fuse_unet=True,
+                fuse_text_encoder=True,
+                lora_scale=1.0,
+                safe_fusing=False,
+            )
         use_lora = True
         is_sdxl = False
     elif lcm_model_name == "stable-diffusion-v1-5":
@@ -68,18 +79,11 @@ def pipe_selector(lcm_model_name):
             use_lora = True
             is_sdxl = True
 
-        if use_lora:
-            unet = MyUNet2DConditionModel.from_pretrained(unet_id, torch_dtype=torch.float16, variant="fp16")
-            pipe = MySDXLipeline.from_pretrained(model_id, unet = unet, variant="fp16", torch_dtype=torch.float16).to("cuda")
-            pipe.load_lora_weights(lcm_lora_id)
-        else:
-            unet = MyUNet2DConditionModel.from_pretrained(unet_id, torch_dtype=torch.float16, variant="fp16")
-            pipe = MySDXLipeline.from_pretrained(model_id, unet=unet, torch_dtype=torch.float16).to("cuda")
-
     if use_lcm:
         pipe.scheduler = LCMScheduler.from_config(pipe.scheduler.config)
     else:
-        pipe.scheduler = PNDMScheduler.from_pretrained("runwayml/stable-diffusion-v1-5", subfolder="scheduler")
+        # pipe.scheduler = PNDMScheduler.from_pretrained("runwayml/stable-diffusion-v1-5", subfolder="scheduler")
+        pass
         # pipe.scheduler = DDIMScheduler.from_config(
         # pipe.scheduler.config, rescale_betas_zero_snr=True, timestep_spacing="trailing"
         # )
