@@ -35,5 +35,5 @@ prompt: ""
 negative_prompt: ""
 guidance_scale: -1
 # ======== LCM model name =========
-lcm_model_name: "lcm-lora-sdv1-5"   # "LCM_Dreamshaper_v7", "lcm-lora-sdv1-5", "lcm-sdxl", "lcm-ssd-1b", "lcm-lora-sdxl", "lcm-lora-ssd-1b", "stable-diffusion-v1-5"
+lcm_model_name: "stable-diffusion-v1-5"   # "LCM_Dreamshaper_v7", "lcm-lora-sdv1-5", "lcm-sdxl", "lcm-ssd-1b", "lcm-lora-sdxl", "lcm-lora-ssd-1b", "stable-diffusion-v1-5"
 extract_mode: "iid_noise_denoise"   # "iid_noise_denoise" ,   # "iid_noise_denoise", "consistency_generation", "ddim_inversion", "dual_unet_smoothing_generation", "dual_unet_smoothing_inversion", "w/o_noise_denoise"
