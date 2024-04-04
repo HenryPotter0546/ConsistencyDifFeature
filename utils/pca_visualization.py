@@ -22,7 +22,6 @@ import os
 from math import sqrt
 from torchvision import transforms as T
 
-
 def pca(
         config, 
         image_paths, 
@@ -50,7 +49,7 @@ def pca(
     """
 
     save_path= config.get("save_path")
-    weights_path = "/home/zzw5373/ConsistentDiffusionHyperfeatures/top_ckpt/checkpoint_step_2500.pt"
+    weights_path = "/home/zzw5373/wh/diffusion_hyperfeatures/weights/aggregation_network.pt"
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     diffusion_extractor = CDHFExtractor(config)
     dims = config.get("dims")
@@ -76,7 +75,7 @@ def pca(
         #image_batch, image_pil = extractor.preprocess(image_path, load_size)
         #descs = extractor.extract_descriptors(image_batch.to(device), layer, facet, bin, include_cls=False).cpu().numpy()
         image_pil = Image.open(f"{image_path}").convert("RGB")
-        save_path = '/home/zzw5373/ConsistentDiffusionHyperfeatures/visual_figure'+'/origin.jpg'
+        save_path = '/home/zzw5373/wh/ConsistentDiffusionHyperfeatures/visual_figure'+'/origin.jpg'
         image_pil.save(save_path)
         image, image_pil = process_image(image_pil, res=load_size)
         image_pil_list.append(image_pil)
@@ -114,7 +113,7 @@ def pca(
                 npimg = image.cpu().numpy()
                 plt.imshow(npimg, interpolation='nearest')
                 plt.axis('off')
-                plt.savefig('/home/zzw5373/ConsistentDiffusionHyperfeatures/PCA_result/'+'layer_'+str(index)+'_top'+str(i)+'.jpg')
+                plt.savefig('/home/zzw5373/wh/ConsistentDiffusionHyperfeatures/PCA_result/'+'layer_'+str(index)+'_top'+str(i)+'.jpg')
 
             # assign top 3 to rgb channels and visualize it.
             image = VT_k[:,:3].view(h,h,3)
@@ -122,7 +121,7 @@ def pca(
             npimg = image.cpu().numpy()
             plt.imshow(npimg, interpolation='nearest')
             plt.axis('off')
-            plt.savefig('/home/zzw5373/ConsistentDiffusionHyperfeatures/PCA_result/'+'layer_'+str(index)+'.jpg')
+            plt.savefig('/home/zzw5373/wh/ConsistentDiffusionHyperfeatures/PCA_result/'+'layer_'+str(index)+'.jpg')
 
 def process_image(image_pil, res=None, range=(-1, 1)):
     if res:
@@ -157,7 +156,7 @@ def str2bool(v):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Facilitate ViT Descriptor PCA.')
-    parser.add_argument('--root_dir', type=str, default='/home/zzw5373/ConsistentDiffusionHyperfeatures/img/feature', help='The root dir of images.')
+    parser.add_argument('--root_dir', type=str, default='/home/zzw5373/wh/ConsistentDiffusionHyperfeatures/img/feature', help='The root dir of images.')
     parser.add_argument('--save_dir', type=str, default='PCA_result', help='The root save dir for results.')
     parser.add_argument('--load_size', default=224, type=int, help='load size of the input image.')
     parser.add_argument('--stride', default=4, type=int, help="""stride of first convolution layer. 
@@ -174,7 +173,7 @@ if __name__ == "__main__":
     parser.add_argument('--last_components_rgb', default='True', type=str2bool, help="save last components as rgb image.")
     parser.add_argument('--save_resized', default='True', type=str2bool, help="If true save pca in image resolution.")
     parser.add_argument('--all_together', default='False', type=str2bool, help="If true apply pca on all images together.")
-    parser.add_argument('--config_path', default='/home/zzw5373/ConsistentDiffusionHyperfeatures/configs/pca.yaml', help="The path to config yaml")
+    parser.add_argument('--config_path', default='/home/zzw5373/wh/ConsistentDiffusionHyperfeatures/configs/pca.yaml', help="The path to config yaml")
 
     args = parser.parse_args()
 

@@ -19,6 +19,7 @@ from utils.util import (
     compute_pck,
     rescale_points
 )
+from utils.wandb_util import get_wandb_run_name
 from src.detectron2.resnet import collect_dims
 from src.aggregation_network import AggregationNetwork
 from src.feature_extractor import CDHFExtractor
@@ -49,7 +50,14 @@ def log_aggregation_network(aggregation_network, config):
     ax.set_yticks(range(num_layers))
     ax.set_yticklabels(range(1, num_layers+1))
     ax.set_xlabel("Timestep")
-    ax.set_xticklabels(save_timestep)
+    timestep_label = []
+    for ts in save_timestep:
+        if ts == 49:
+            timestep_label.append(0)
+        else:
+            timestep_label.append(50-ts)
+    timestep_label.reverse()
+    ax.set_xticklabels(timestep_label)
     ax.set_xticks(range(num_timesteps))
     wandb.log({f"mixing_weights": plt})
 
@@ -76,6 +84,30 @@ def get_hyperfeats(diffusion_extractor, aggregation_network, imgs):
     # diffusion_hyperfeats = aggregation_network(img2_feats.float().view((b, -1, w, h)))
     # img2_hyperfeats = diffusion_hyperfeats[0][None, ...]
     # return img1_hyperfeats, img2_hyperfeats
+
+def get_feats(diffusion_extractor, aggregation_network, imgs):
+    with torch.inference_mode():
+        torch.cuda.set_device("cuda:0")
+        with autocast():
+        # diffusion_extractor = diffusion_extractor.to("cuda:1")
+            imgs.to(torch.float16).to("cuda:0")
+            feats = diffusion_extractor.forward(imgs)
+            b, s, l, w, h = feats.shape
+        splits = [1280, 1280, 1280, 1280, 1280, 1280, 640, 640, 640, 320, 320, 320]
+        feats_split = torch.split(feats, splits, dim=2)
+        return feats_split[3][0],feats_split[3][1]
+
+def get_multifeats(diffusion_extractor, aggregation_network, imgs, device="cuda"):
+    with torch.inference_mode():
+        torch.cuda.set_device(device)
+        with autocast():
+        # diffusion_extractor = diffusion_extractor.to("cuda:1")
+            imgs.to(torch.float16).to(device)
+            feats = diffusion_extractor.forward(imgs)
+            b, s, l, w, h = feats.shape
+        splits = [1280, 1280, 1280, 1280, 1280, 1280, 640, 640, 640, 320, 320, 320]
+        feats_split = torch.split(feats, splits, dim=2)
+        return feats_split
 
 def compute_clip_loss(aggregation_network, img1_hyperfeats, img2_hyperfeats, source_points, target_points, output_size):
     # Assumes hyperfeats are batch_size=1 to avoid complex indexing
@@ -182,14 +214,13 @@ def train(config, diffusion_extractor, aggregation_network, optimizer, train_ann
                     save_model(config, aggregation_network, optimizer, step)
                     validate(config, diffusion_extractor, aggregation_network, val_anns)
 
-def load_models(config_path):
+def load_models(config_path, device="cuda"):
     config = OmegaConf.load(config_path)
     config = OmegaConf.to_container(config, resolve=True)
     # device = config.get("device", "cuda")
-    device = "cuda:0"
     # diffusion_extractor = DiffusionExtractor(config, device)
     # weights = torch.load(config["weights_path"], map_location="cpu")
-    diffusion_extractor = CDHFExtractor(config)
+    diffusion_extractor = CDHFExtractor(config, device=device)
     dims = config.get("dims")
     if dims is None:
         dims = collect_dims(diffusion_extractor.pipe.unet, idxs=diffusion_extractor.idxs)
@@ -206,8 +237,9 @@ def load_models(config_path):
     return config, diffusion_extractor, aggregation_network
 
 def main(args):
-    config, diffusion_extractor, aggregation_network = load_models(args.config_path)
-    wandb.init(project=config["wandb_project"], name=config["wandb_run"])
+    device = "cuda:1"
+    config, diffusion_extractor, aggregation_network = load_models(args.config_path, device=device)
+    wandb.init(project=config["wandb_project"], name=get_wandb_run_name(config))
     wandb.run.name = f"{str(wandb.run.id)}_{wandb.run.name}"
     parameter_groups = [
         {"params": aggregation_network.mixing_weights, "lr": config["lr"]},

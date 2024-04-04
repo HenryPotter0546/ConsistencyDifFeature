@@ -31,10 +31,11 @@ from train_aggregation_network import (
 )
 
 def test(config, diffusion_extractor, aggregation_network, files_list):
-    device = config.get("device", "cuda")
+    device = "cuda:2"
     output_size, load_size = get_rescale_size(config)
     pck_threshold = config["pck_threshold"]
     test_dist, test_pck_img, test_pck_bbox = [], [], []
+    splits = [1280, 1280, 1280, 1280, 1280, 1280, 640, 640, 640, 320, 320, 320]
     
     #test_anns = json.load(open(config["test_path"]))
     for j, an in tqdm(enumerate(files_list)):
@@ -43,6 +44,7 @@ def test(config, diffusion_extractor, aggregation_network, files_list):
             source_points, target_points, img1_pil, img2_pil, imgs = load_image_pair_for_test(ann, load_size, device, image_path=config["image_path"])
             # img1_hyperfeats, img2_hyperfeats = get_hyperfeats(diffusion_extractor, aggregation_network, imgs)
             img1_hyperfeats, img2_hyperfeats = get_feats(diffusion_extractor, aggregation_network, imgs)
+            
             # Assuming compute_clip_loss is used for testing as well
             #loss = compute_clip_loss(aggregation_network, img1_hyperfeats, img2_hyperfeats, source_points, target_points, output_size)
             #wandb.log({"test/loss": loss.item()}, step=j)

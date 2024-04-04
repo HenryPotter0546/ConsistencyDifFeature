@@ -6,18 +6,19 @@ import torchvision
 import tqdm
 
 class CDHFExtractor:
-    def __init__(self, config, use_xformers=False):
-        self.device="cuda:0"
+    def __init__(self, config, use_xformers=False, device="cuda"):
+        self.device=device
         self.save_timestep = config["save_timestep"]
         self.extract_mode = config["extract_mode"]
-        pipe_dict = pipe_selector(config["lcm_model_name"])
+        pipe_dict = pipe_selector(config["lcm_model_name"], device=device)
         self.pipe = pipe_dict["pipe"]
         self.use_lora = pipe_dict["use_lora"]
         self.is_sdxl = pipe_dict["is_sdxl"]
         self.lcm_name = pipe_dict["lcm_model_name"]
         self.output_resolution = config["output_resolution"]
         self.num_time_steps = config["num_timesteps"]
-        self.idxs = [(0, 0), (0, 1), (0, 2), (1, 0), (1, 1), (1, 2), (2, 0), (2, 1), (2, 2), (3, 0), (3, 1), (3, 2)]
+        # self.idxs = [(0, 0), (0, 1), (0, 2), (1, 0), (1, 1), (1, 2), (2, 0), (2, 1), (2, 2), (3, 0), (3, 1), (3, 2)]
+        self.idxs = [(1, 0)]
         if use_xformers:
             self.pipe.enable_xformers_memory_efficient_attention()
         if self.is_sdxl:
@@ -57,11 +58,11 @@ class CDHFExtractor:
     def collect_and_resize_feats(self, unet, idxs, timestep, resolution=-1):
         latent_feats = self.collect_feats(unet, idxs=idxs)
         latent_feats = [feat[timestep] for feat in latent_feats]   # latent_feats[0][49].shape is torch.Size([1, 1280, 8, 8])
-        # print(len(latent_feats))
-        # for layer_feat in latent_feats:
-        #     print(layer_feat.shape)
-        if resolution > 0:
-            latent_feats = [torch.nn.functional.interpolate(latent_feat, size=resolution, mode="bilinear") for latent_feat in latent_feats]
+        print(len(latent_feats))
+        for layer_feat in latent_feats:
+            print(layer_feat.shape)
+        # if resolution > 0:
+        #     latent_feats = [torch.nn.functional.interpolate(latent_feat, size=resolution, mode="bilinear") for latent_feat in latent_feats]
         # print(len(latent_feats))
         # for layer_feat in latent_feats:
         #     print(layer_feat.shape)
@@ -123,14 +124,13 @@ class CDHFExtractor:
     ):
         # 1. encode image and prompt
         images = torch.nn.functional.interpolate(images, size=512, mode="bilinear")
-        images = images.to(torch.float16).to("cuda:0")
+        images = images.to(torch.float16).to(self.device)
         img_latent = self.pipe.vae.encode(images).latent_dist.sample(generator=None) * 0.18215
         additional_embeds = self.encode_prompt_general(prompt)
 
         # 2. prepare scheduler
         self.pipe.scheduler.set_timesteps(self.num_time_steps, self.device)
         timesteps = self.pipe.scheduler.timesteps
-
 
         # 3. Unet reconstruction
         self.pipe.output_resolution = self.output_resolution

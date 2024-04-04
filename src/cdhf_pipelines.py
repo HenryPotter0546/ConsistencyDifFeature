@@ -180,8 +180,7 @@ class MyLCMPipeline(LatentConsistencyModelPipeline):
         additional_embeds: Optional[Tuple[str, Any]] = None,
         cross_attention_kwargs: Optional[Dict[str, Any]] = None
     ):
-        device = self._execution_device
-        device = "cuda:0"
+        device = self.device
         prompt_embeds, _ = additional_embeds
         batch_size = x_t_latent.shape[0]
         # repeat prompt_embeds to batch_size

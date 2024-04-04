@@ -1,0 +1,6 @@
+__pycache__/
+*.pt
+wandb/
+spair_ft/
+data/
+results_spair/
