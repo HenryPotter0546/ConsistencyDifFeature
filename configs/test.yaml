@@ -1,12 +1,12 @@
 # ======== Customize Paths =======
-image_path: /home/zzw5373/wh/datasets/SPair-71k/JPEGImages
+image_path: /home/xxx/wh/datasets/SPair-71k/JPEGImages
 wandb_project: cdhf
 wandb_team_name: berkely_akio
 results_folder: test_result
 # ======== Data / Logging ========
 pck_threshold: 0.1
-test_path: /home/zzw5373/wh/datasets/SPair-71k/PairAnnotation/test
-weights_path: /home/zzw5373/wh/ConsistentDiffusionHyperfeatures/top_ckpt/checkpoint_step_2500.pt
+test_path: /home/xxx/wh/datasets/SPair-71k/PairAnnotation/test
+weights_path: /home/xxx/wh/ConsistentDiffusionHyperfeatures/top_ckpt/checkpoint_step_2500.pt
 flip_timesteps: False
 # ======= Ours (All Steps) =======
 # save_timestep: [49, 45, 40, 35, 30, 25, 20, 15, 10, 5, 0]
