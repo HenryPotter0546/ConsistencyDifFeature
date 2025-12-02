@@ -11,7 +11,7 @@ from omegaconf import OmegaConf
 import os
 
 
-config_path = "/home/zzw5373/wh/ConsistentDiffusionHyperfeatures/configs/train.yaml"
+config_path = "/home/xxx/wh/ConsistentDiffusionHyperfeatures/configs/train.yaml"
 config = OmegaConf.load(config_path)
 config = OmegaConf.to_container(config, resolve=True)
 
