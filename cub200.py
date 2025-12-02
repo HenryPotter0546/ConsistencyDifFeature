@@ -13,7 +13,7 @@ class Cub2011(Dataset):
 
     def __init__(self, root, train=False, transform=None, loader=default_loader, download=False):
         # self.root = os.path.expanduser(root)
-        self.root = '/home/zzw5373/wh/datasets'
+        self.root = 'xxxx'
         self.transform = transform
         self.loader = default_loader
         self.train = train
