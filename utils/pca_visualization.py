@@ -49,7 +49,7 @@ def pca(
     """
 
     save_path= config.get("save_path")
-    weights_path = "/home/zzw5373/wh/diffusion_hyperfeatures/weights/aggregation_network.pt"
+    weights_path = "xxx"
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     diffusion_extractor = CDHFExtractor(config)
     dims = config.get("dims")
@@ -75,7 +75,7 @@ def pca(
         #image_batch, image_pil = extractor.preprocess(image_path, load_size)
         #descs = extractor.extract_descriptors(image_batch.to(device), layer, facet, bin, include_cls=False).cpu().numpy()
         image_pil = Image.open(f"{image_path}").convert("RGB")
-        save_path = '/home/zzw5373/wh/ConsistentDiffusionHyperfeatures/visual_figure'+'/origin.jpg'
+        save_path = 'xxx'+'/origin.jpg'
         image_pil.save(save_path)
         image, image_pil = process_image(image_pil, res=load_size)
         image_pil_list.append(image_pil)
@@ -113,7 +113,7 @@ def pca(
                 npimg = image.cpu().numpy()
                 plt.imshow(npimg, interpolation='nearest')
                 plt.axis('off')
-                plt.savefig('/home/zzw5373/wh/ConsistentDiffusionHyperfeatures/PCA_result/'+'layer_'+str(index)+'_top'+str(i)+'.jpg')
+                plt.savefig('xxx'+'layer_'+str(index)+'_top'+str(i)+'.jpg')
 
             # assign top 3 to rgb channels and visualize it.
             image = VT_k[:,:3].view(h,h,3)
